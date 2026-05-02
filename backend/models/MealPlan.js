@@ -17,7 +17,18 @@ class MealPlan {
             [userId, recipe_id, date, meal_type]
         );
 
-        return result.rows[0];
+        const newMeal = result.rows[0];
+        
+        // Fetch the recipe name to return to the frontend
+        const joinedResult = await db.query(
+            `SELECT mp.*, r.name as recipe_name 
+             FROM meal_plans mp 
+             JOIN recipes r ON mp.recipe_id = r.id 
+             WHERE mp.id = $1`,
+            [newMeal.id]
+        );
+
+        return joinedResult.rows[0];
     }
 
     static async findByDateRange(userId, startDate, endDate) {
